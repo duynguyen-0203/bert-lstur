@@ -1,4 +1,5 @@
 import argparse
+import getpass
 
 
 def add_train_arguments(parser: argparse.ArgumentParser):
@@ -6,6 +7,7 @@ def add_train_arguments(parser: argparse.ArgumentParser):
     _add_train_data_args(parser)
     _add_model_args(parser)
     _add_train_args(parser)
+    _add_telegram_token(parser)
 
 
 def add_eval_arguments(parser: argparse.ArgumentParser):
@@ -104,3 +106,17 @@ def _add_train_args(parser: argparse.ArgumentParser):
     parser.add_argument('--evaluation_info', type=str, nargs='+', choices=['loss', 'metrics'],
                         help='Evaluation information to log')
     parser.add_argument('--eval_steps', type=int, help='Number of update steps between two evaluations')
+    parser.add_argument('--use_telegram_notify', action='store_true',
+                        help='Whether to announce the results via telegram or not')
+
+
+def _add_telegram_token(parser: argparse.ArgumentParser):
+    parser.add_argument('--telegram_token', action=Password, nargs='?', dest='Telegram token: ')
+    parser.add_argument('--telegram_chat_id', action=Password, nargs='?', dest='Telegram chat ID: ')
+
+
+class Password(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if values is None:
+            values = getpass.getpass(self.dest)
+        setattr(namespace, self.dest, values)

@@ -48,3 +48,6 @@
 --logging_steps 200
 --evaluation_info metrics
 --eval_steps 400
+--use_telegram_notify
+
+--telegram_token sdfasdf

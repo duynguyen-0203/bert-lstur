@@ -27,10 +27,12 @@ def main():
     arguments.add_eval_arguments(eval_parser)
 
     args = parser.parse_args()
-    if args.mode == 'train':
-        _train(args)
-    elif args.mode == 'eval':
-        _eval(args)
+    print(args)
+    print(args.telegram_token)
+    # if args.mode == 'train':
+    #     _train(args)
+    # elif args.mode == 'eval':
+    #     _eval(args)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 import csv
 import random
-from typing import List, Tuple
 
 from transformers import PreTrainedTokenizer
 
@@ -37,7 +36,7 @@ class Reader:
 
         return dataset
 
-    def _read(self, data_name: str, news_path: str) -> Tuple[Dataset, dict]:
+    def _read(self, data_name: str, news_path: str) -> tuple[Dataset, dict]:
         dataset = Dataset(data_name, self._tokenizer, self._category2id)
         news_dataset = self._read_news_info(news_path, dataset)
 
@@ -124,7 +123,7 @@ class Reader:
             dataset.add_sample(user_id, history_clicked, impression)
 
 
-def sample_news(list_news: List[News], num_news: int, pad: News) -> List:
+def sample_news(list_news: list[News], num_news: int, pad: News) -> list:
     if len(list_news) >= num_news:
         return random.sample(list_news, k=num_news)
     else:

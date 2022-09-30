@@ -19,7 +19,7 @@ class BaseTrainer(ABC):
         self._init_logger()
         self._device = torch.device(utils.get_device())
         if utils.get_device() == 'cuda':
-            self._logger.info(f'GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}')
+            self._log_message(f'GPU: {torch.cuda.get_device_name(torch.cuda.current_device())}')
         utils.set_seed(args.seed)
 
     @abstractmethod
@@ -104,9 +104,9 @@ class BaseTrainer(ABC):
         Returns:
             None
         """
-        self._logger.info(f'Dataset: {self.args.data_name}')
-        self._logger.info(f'Train dataset: {len(train_dataset)} samples')
-        self._logger.info(f'Validation dataset: {len(valid_dataset)} samples')
+        self._log_message(f'Dataset: {self.args.data_name}')
+        self._log_message(f'Train dataset: {len(train_dataset)} samples')
+        self._log_message(f'Validation dataset: {len(valid_dataset)} samples')
 
     def _log_train_step(self, scheduler, loss, global_step):
         r"""
@@ -140,7 +140,7 @@ class BaseTrainer(ABC):
         lr = scheduler.get_last_lr()
         data = [global_step, epoch, loss, float(lr[0])]
         logger_utils.log_csv(self._loss_csv, data)
-        self._logger.info(f'Training loss at global step {global_step}: {loss}')
+        self._log_message(f'Training loss at global step {global_step}: {loss}')
         self._writer.add_scalar('Training loss per logging step', loss, global_step=global_step)
 
     def _log_epoch(self, train_loss: float, valid_loss: float, scores: dict, epoch: int):
@@ -156,17 +156,17 @@ class BaseTrainer(ABC):
         Returns:
             None
         """
-        self._logger.info(f'------  Epoch {epoch} Summary  ------')
-        self._logger.info(f'Training loss: {train_loss}')
+        self._log_message(f'------  Epoch {epoch} Summary  ------')
+        self._log_message(f'Training loss: {train_loss}')
         data = [epoch, train_loss]
         self._writer.add_scalar('Training loss per epoch', train_loss, global_step=epoch)
         if 'loss' in self.args.evaluation_info:
             data.append(valid_loss)
-            self._logger.info(f'Validation loss: {valid_loss}')
+            self._log_message(f'Validation loss: {valid_loss}')
             self._writer.add_scalar('Validation loss per epoch', valid_loss, global_step=epoch)
         if 'metrics' in self.args.evaluation_info:
             for metric, score in scores.items():
-                self._logger.info(f'{metric}: {score}')
+                self._log_message(f'{metric}: {score}')
             data.extend(list(scores.values()))
             self._writer.add_scalar('Validation AUC score per epoch', scores['auc'], global_step=epoch)
         logger_utils.log_csv(self._eval_epoch, data)
@@ -183,15 +183,15 @@ class BaseTrainer(ABC):
         Returns:
             None
         """
-        self._logger.info(f'------  Evaluation at global step {global_step}  ------')
+        self._log_message(f'------  Evaluation at global step {global_step}  ------')
         data = [global_step]
         if 'loss' in self.args.evaluation_info:
             data.append(loss)
-            self._logger.info(f'Loss {loss}')
+            self._log_message(f'Loss {loss}')
             self._writer.add_scalar('Validation loss per step', loss, global_step=global_step)
         if 'metrics' in self.args.evaluation_info:
             for metric, score in scores.items():
-                self._logger.info(f'{metric}: {score}')
+                self._log_message(f'{metric}: {score}')
             data.extend(list(scores.values()))
             self._writer.add_scalar('Validation AUC score per step', scores['auc'], global_step=global_step)
 
@@ -243,3 +243,8 @@ class BaseTrainer(ABC):
         warmup_steps = (self.args.warmup_steps if self.args.warmup_steps is not None
                         else math.ceil(num_training_steps * self.args.warmup_ratio))
         return warmup_steps
+
+    def _log_message(self, message: str):
+        self._logger.info(message)
+        if self.args.use_telegram_notify:
+            logger_utils.log_telegram_message(message)

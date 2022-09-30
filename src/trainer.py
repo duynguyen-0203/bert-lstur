@@ -1,7 +1,6 @@
 import json
 import math
 import time
-from typing import List
 
 import torch
 from torch.cuda.amp import GradScaler
@@ -9,6 +8,7 @@ import torch.nn as nn
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from tqdm.contrib.telegram import tqdm as telegram_tqdm
 import transformers
 from transformers import AutoTokenizer, RobertaConfig
 
@@ -128,7 +128,10 @@ class Trainer(BaseTrainer):
             accumulation_factor = (self.args.gradient_accumulation_steps
                                    if steps_in_epoch > self.args.gradient_accumulation_steps else steps_in_epoch)
 
-            for step, batch in tqdm(enumerate(train_dataloader), total=steps_in_epoch, desc=f'Train epoch {epoch}'):
+            for step, batch in tqdm(enumerate(train_dataloader), total=steps_in_epoch, desc=f'Train epoch {epoch}') \
+                    if not args.use_telegram_notify \
+                    else telegram_tqdm(enumerate(train_dataloader), total=steps_in_epoch, desc=f'Train epoch {epoch}',
+                                       token=args.telegram_token, chat_id=args.telegram_chat_id):
                 batch_loss = self._train_step(batch, model, loss_calculator, accumulation_factor)
                 logging_loss += batch_loss
                 epoch_loss += batch_loss
@@ -248,7 +251,7 @@ class Trainer(BaseTrainer):
 
         return (loss * accumulation_factor).item()
 
-    def _eval(self, model, dataset, loss_calculator, metrics: List[str], save_result: bool = False):
+    def _eval(self, model, dataset, loss_calculator, metrics: list[str], save_result: bool = False):
         model.eval()
         dataset.set_mode(Dataset.EVAL_MODE)
         if self.args.fast_eval:

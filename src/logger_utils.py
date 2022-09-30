@@ -1,8 +1,10 @@
+import contextlib
 import csv
 import json
 from logging import Logger
 import os
-from typing import List
+
+import telegram_send
 
 
 def reset_logger(logger: Logger):
@@ -22,7 +24,7 @@ def reset_logger(logger: Logger):
         logger.removeFilter(f)
 
 
-def log_csv(path: str, data: List[object]):
+def log_csv(path: str, data: list[object]):
     r"""
     Append a new line to a CSV log file already exists
 
@@ -38,7 +40,7 @@ def log_csv(path: str, data: List[object]):
         writer.writerow(data)
 
 
-def create_csv(path: str, header: List[str] = None):
+def create_csv(path: str, header: list[str] = None):
     r"""
     Create a new CSV file
 
@@ -71,3 +73,8 @@ def log_json(path: str, data: dict, name: str):
     json_path = os.path.join(path, f'{name}.json')
     with open(json_path, mode='w', encoding='utf-8') as f:
         json.dump(obj=vars(data), fp=f, ensure_ascii=False, indent=4, sort_keys=True)
+
+
+def log_telegram_message(message: str):
+    with contextlib.suppress(Exception):
+        telegram_send.send(messages=[message])
