@@ -136,8 +136,7 @@ class NewsEncoder(ABC, RobertaPreTrainedModel):
         # Category encoder
         if self.use_category:
             category_embed = self.category_embedding(category_encoding)
-            category_repr = self.category_dense_layer(category_embed)
-            news_info.append(category_repr)
+            news_info.append(category_embed)
 
         news_repr = torch.concat(news_info, dim=1)
 

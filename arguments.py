@@ -56,7 +56,16 @@ def _add_model_args(parser: argparse.ArgumentParser):
     parser.add_argument('--use_sapo', action='store_true', help='Whether to use sapo embedding or not')
     parser.add_argument('--use_category', action='store_true', help='Whether to use category embedding or not')
     parser.add_argument('--query_dim', type=int, help='The size of query vector in the additive attention network')
-
+    parser.add_argument('--dropout', type=float, help='Dropout value')
+    parser.add_argument('--category_embed_dim', type=int, help='The size of each category embedding vector')
+    parser.add_argument('--num_cnn_filters', type=int, help='The number of output filters in the convolution')
+    parser.add_argument('--window_size', type=int, help='The length of the 1D convolution window')
+    parser.add_argument('--word_embed_dim', type=int, help='Size of each word embedding vector if apply_reduce_dim')
+    parser.add_argument('--num_gru_layers', type=int, help='Number of recurrent layers in GRU network')
+    parser.add_argument('--gru_dropout', type=float, help='Dropout value in GRU network')
+    parser.add_argument('--long_term_dropout', type=float, help='Dropout value in Long-Term User Representations')
+    parser.add_argument('--combine_type', type=str, choices=['ini', 'con'],
+                        help='Method to combine the long-term and short-term user representations')
 
 
 def _add_train_args(parser: argparse.ArgumentParser):

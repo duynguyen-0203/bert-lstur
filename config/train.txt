@@ -1,0 +1,50 @@
+# Common args
+--model_name LSTUR
+--pretrained_tokenizer vinai/phobert-base
+--user2id_path data/user2id.json
+--category2id_path data/category2id.json
+--max_title_length 32
+--max_sapo_length 64
+--his_length 50
+--seed 36
+--metrics auc
+
+# Data args
+--data_name CafeF_News_Recommend_Data
+--train_behaviors_path data/train/behaviors.tsv
+--train_news_path data/train/news.tsv
+--eval_behaviors_path data/valid/behaviors.tsv
+--eval_news_path data/valid/news.tsv
+
+# Model args
+--pretrained_embedding vinai/phobert-base
+--apply_reduce_dim
+--use_category
+--query_dim 200
+--dropout 0.2
+--category_embed_dim 100
+--num_cnn_filters 300
+--window_size 3
+--word_embed_dim 200
+--num_gru_layers 1
+--gru_dropout 0.0
+--long_term_dropout 0.5
+--combine_type ini
+
+
+# Train args
+--npratio 4
+--train_batch_size 8
+--eval_batch_size 64
+--dataloader_drop_last
+--dataloader_num_workers 4
+--dataloader_pin_memory
+--gradient_accumulation_steps 16
+--num_train_epochs 5
+--learning_rate 2e-5
+--warmup_ratio 0.1
+--max_grad_norm 1.0
+--weight_decay 0.01
+--logging_steps 200
+--evaluation_info metrics
+--eval_steps 400
